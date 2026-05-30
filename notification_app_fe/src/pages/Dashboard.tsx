@@ -1,44 +1,102 @@
 import { useEffect, useState } from "react";
+import {
+  Container,
+  Typography,
+  Pagination,
+} from "@mui/material";
+
+import NotificationCard from "../components/NotificationCard";
+import FilterBar from "../components/FilterBar";
+
 import { getTopNotifications } from "../services/notificationService";
 import type { AppNotification } from "../types/Notification";
 
 function Dashboard() {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [filter, setFilter] = useState("All");
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     async function loadNotifications() {
       const data = await getTopNotifications();
-
-      console.log("Top Notifications:", data);
-
+      console.log("DATA:", data);
       setNotifications(data);
     }
 
     loadNotifications();
   }, []);
 
-  return (
-    <div style={{ padding: "20px" }}>
-      <h1>Campus Notifications</h1>
+  const filteredNotifications =
+    filter === "All"
+      ? notifications
+      : notifications.filter(
+          (notification) => notification.Type === filter
+        );
 
-      {notifications.map((notification) => (
-        <div
-          key={notification.ID}
-          style={{
-            border: "1px solid #ccc",
-            padding: "12px",
-            marginBottom: "10px",
-            borderRadius: "8px",
+  const itemsPerPage = 5;
+
+  const paginatedNotifications = filteredNotifications.slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage
+  );
+
+  return (
+    <Container sx={{ mt: 4 }}>
+      <Typography
+        variant="h3"
+        gutterBottom
+        sx={{ fontWeight: 700 }}
+      >
+        Campus Notifications
+      </Typography>
+
+      <FilterBar
+        selected={filter}
+        onChange={(value) => {
+          setFilter(value);
+          setPage(1);
+        }}
+      />
+
+      {paginatedNotifications.length > 0 ? (
+        paginatedNotifications.map((notification) => (
+          <NotificationCard
+            key={notification.ID}
+            notification={notification}
+          />
+        ))
+      ) : (
+        <Typography
+          variant="h6"
+          sx={{
+            mt: 4,
+            textAlign: "center",
           }}
         >
-          <h3>{notification.Type}</h3>
+          No notifications found
+        </Typography>
+      )}
 
-          <p>{notification.Message}</p>
-
-          <small>{notification.Timestamp}</small>
+      {filteredNotifications.length > itemsPerPage && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "20px",
+            marginBottom: "20px",
+          }}
+        >
+          <Pagination
+            count={Math.ceil(
+              filteredNotifications.length / itemsPerPage
+            )}
+            page={page}
+            onChange={(_, value) => setPage(value)}
+            color="primary"
+          />
         </div>
-      ))}
-    </div>
+      )}
+    </Container>
   );
 }
 
