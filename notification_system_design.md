@@ -1,49 +1,102 @@
-# Stage 1
+# Notification System Design
 
-## Notification Prioritization Strategy
+## Overview
 
-# Stage 1
+The Campus Notification System is designed to display important notifications for students related to:
 
-## Notification Prioritization Strategy
+- Placements
+- Results
+- Events
 
-The notification system receives three types of notifications:
+The application fetches notifications from the provided API, prioritizes them, and displays them through a responsive React frontend.
 
-* Placement
-* Result
-* Event
+---
 
-To ensure that users see the most important notifications first, a priority-based ranking system is used.
+## Architecture
 
-### Priority Order
+Frontend:
+- React
+- TypeScript
+- Material UI
 
-| Notification Type | Priority |
-| ----------------- | -------- |
-| Placement         | 3        |
-| Result            | 2        |
-| Event             | 1        |
+Backend:
+- External Notification API
+- JWT Authentication
 
-### Sorting Logic
+Logging:
+- Custom reusable logging middleware
 
-Notifications are sorted using the following rules:
+---
 
-1. Higher priority notifications appear before lower priority notifications.
-2. If two notifications have the same priority, the newer notification is displayed first.
-3. Only the top 10 notifications are shown to the user.
+## Notification Flow
 
-### Algorithm
+1. User opens application.
+2. Frontend authenticates using access token.
+3. Notifications are fetched from API.
+4. Notifications are sorted by priority:
+   - Placement
+   - Result
+   - Event
+5. Latest notifications are displayed first.
+6. User can filter notifications by type.
+7. User can navigate notifications using pagination.
 
-1. Fetch notifications from the Notification API.
-2. Assign a priority score based on notification type.
-3. Sort notifications by:
+---
 
-   * Priority (Descending)
-   * Timestamp (Descending)
-4. Select the first 10 notifications.
-5. Display the notifications to the user.
+## Priority Logic
 
-### Benefits
+Priority Order:
 
-* Important placement updates are never missed.
-* Academic results receive higher visibility than general events.
-* Recent updates are prioritized over older notifications.
-* The solution remains scalable as the number of notifications grows.
+1. Placement
+2. Result
+3. Event
+
+Within the same category, notifications are sorted by timestamp in descending order.
+
+---
+
+## Filtering
+
+Supported Filters:
+
+- All
+- Placement
+- Result
+- Event
+
+---
+
+## Pagination
+
+Pagination is implemented on the frontend.
+
+Notifications per page: 5
+
+Benefits:
+- Better user experience
+- Faster rendering
+- Improved readability
+
+---
+
+## Logging Middleware
+
+Reusable logging utility:
+
+Log(stack, level, package, message)
+
+Used for:
+- API requests
+- API failures
+- UI events
+- Error tracking
+
+---
+
+## Future Improvements
+
+- Real-time notifications using WebSockets
+- Search functionality
+- Notification read/unread tracking
+- Push notifications
+- Dark/Light theme switching
